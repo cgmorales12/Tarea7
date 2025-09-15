@@ -4,20 +4,21 @@ import { LoginService } from '../../service/login.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-dashboard.component',
+  selector: 'app-dashboard',
   imports: [FormsModule, ReactiveFormsModule],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css',
+  styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit {
-  lista_usaurio: IUsuarioInterface[] = [];
+  lista_usuario: IUsuarioInterface[] = [];
+  reporteCSV = '';
 
   constructor(private usuariosServicio: LoginService) {}
 
   ngOnInit(): void {
     this.usuariosServicio.todos_usuarios().subscribe((lista) => {
       console.table(lista);
-      this.lista_usaurio = lista;
+      this.lista_usuario = lista;
     });
   }
   imprimir() {
@@ -53,9 +54,14 @@ ${html}
     );
   }
 
-  exportarCSV() {
+  private crearCSV(): string {
     const encabezados = ['id', 'nombre', 'apellido', 'email', 'activo'];
-    const filas = this.lista_usaurio.map((u) => [
+    const escape = (valor: unknown) =>
+      `"${String(valor ?? '')
+        .replace(/"/g, '""')
+        .replace(/,/g, '\\,')}"`;
+
+    const filas = this.lista_usuario.map((u) => [
       u.id,
       u.nombre,
       u.apellido,
@@ -63,11 +69,15 @@ ${html}
       u.activo ? 'true' : 'false',
     ]);
 
-    let csv = encabezados.join(',') + '\n';
+    let csv = encabezados.map(escape).join(',') + '\n';
     filas.forEach((fila) => {
-      csv += fila.join(',') + '\n';
+      csv += fila.map(escape).join(',') + '\n';
     });
+    return csv;
+  }
 
+  exportarCSV() {
+    const csv = this.crearCSV();
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const enlace = document.createElement('a');
     enlace.href = URL.createObjectURL(blob);
@@ -75,5 +85,9 @@ ${html}
     document.body.appendChild(enlace);
     enlace.click();
     document.body.removeChild(enlace);
+  }
+
+  verReporteCSV() {
+    this.reporteCSV = this.crearCSV();
   }
 }
