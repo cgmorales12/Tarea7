@@ -118,11 +118,20 @@ export class DashboardComponent implements OnInit {
   editarUsuario(usuario: IUsuarioInterface) {
     const nombre = prompt('Nombre', usuario.nombre);
     if (nombre === null) return;
+
     const apellido = prompt('Apellido', usuario.apellido);
     if (apellido === null) return;
+
     const email = prompt('Email', usuario.email);
     if (email === null) return;
-    const activo = confirm('¿Usuario activo?');
+
+    const estado = prompt(
+      'Estado (Activo/Inactivo)',
+      usuario.activo ? 'Activo' : 'Inactivo'
+    );
+    if (estado === null) return;
+    const activo = estado.toLowerCase() === 'activo';
+
     const actualizado: IUsuarioInterface = {
       ...usuario,
       nombre,
