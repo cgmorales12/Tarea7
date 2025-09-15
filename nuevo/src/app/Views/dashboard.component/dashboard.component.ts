@@ -52,4 +52,28 @@ ${html}
 </html>`
     );
   }
+
+  exportarCSV() {
+    const encabezados = ['id', 'nombre', 'apellido', 'email', 'activo'];
+    const filas = this.lista_usaurio.map((u) => [
+      u.id,
+      u.nombre,
+      u.apellido,
+      u.email,
+      u.activo ? 'true' : 'false',
+    ]);
+
+    let csv = encabezados.join(',') + '\n';
+    filas.forEach((fila) => {
+      csv += fila.join(',') + '\n';
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const enlace = document.createElement('a');
+    enlace.href = URL.createObjectURL(blob);
+    enlace.setAttribute('download', 'usuarios.csv');
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+  }
 }
