@@ -181,4 +181,26 @@ export class DashboardComponent implements OnInit {
       this.lista_usuario = this.lista_usuario.filter((u) => u.id !== id);
     });
   }
+
+  exportarCSV() {
+    const encabezados = ['Nombre', 'Apellido', 'Email', 'Estado'];
+    const filas = this.lista_usaurio.map((usuario) =>
+      [
+        usuario.nombre,
+        usuario.apellido,
+        usuario.email,
+        usuario.activo == false ? 'Usuario Inactivo' : 'Usuario Activo',
+      ]
+        .map((valor) => `"${String(valor).replace(/,/g, '\\,')}"`)
+        .join(',')
+    );
+    const contenido = [encabezados.map((h) => `"${h}"`).join(','), ...filas].join('\n');
+    const blob = new Blob([contenido], { type: 'text/csv;charset=utf-8;' });
+    const enlace = document.createElement('a');
+    enlace.href = URL.createObjectURL(blob);
+    enlace.setAttribute('download', 'usuarios.csv');
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+  }
 }

@@ -57,3 +57,11 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Pruebas manuales
+
+Para comprobar la exportación a CSV con valores que contienen comas:
+
+1. Asegúrate de tener usuarios con campos que incluyan comas, por ejemplo un nombre `"Doe, John"`.
+2. Ejecuta el método `exportarCSV` desde la interfaz o la consola.
+3. Abre el archivo `usuarios.csv` generado y verifica que cada campo esté envuelto en comillas y que las comas internas aparezcan como `\\,`.
