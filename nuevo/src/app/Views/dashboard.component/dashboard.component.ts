@@ -22,36 +22,60 @@ export class DashboardComponent implements OnInit {
     });
   }
   imprimir() {
-    const html = document.getElementById('area_imprimir')?.innerHTML;
-    const ventana = window.open('', '', 'height=600, width=900');
-    ventana?.document.open();
-    ventana?.document.write(
-      `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Nuevo</title>
-  <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <style>
-@media print{
-  button{
-    display: none;
-  }
-}
-@page{
-  size: A4 portrait;
-  margin: 12mm
-}
-  </style>
-</head>
-<body onload="window.print(); window.close();">
-${html}
-  
-</body>
-</html>`
+    const encabezado = ['#', 'Nombre', 'Apellido', 'Email', 'Estado'];
+    const filas = this.lista_usuario.map((u, i) => [
+      i + 1,
+      u.nombre,
+      u.apellido,
+      u.email,
+      u.activo ? 'Usuario Activo' : 'Usuario Inactivo',
+    ]);
+
+    const lineas = [encabezado.join(' | '), ...filas.map((f) => f.join(' | '))];
+    let y = 800;
+    const contenido =
+      lineas
+        .map((linea) => {
+          const texto = linea
+            .replace(/\\/g, '\\\\')
+            .replace(/\(/g, '\\(')
+            .replace(/\)/g, '\\)');
+          const parte = `BT /F1 12 Tf 40 ${y} Td (${texto}) Tj ET`;
+          y -= 20;
+          return parte;
+        })
+        .join('\n') + '\n';
+
+    const offsets: number[] = [];
+    let pdf = '%PDF-1.3\n';
+
+    const agregar = (obj: string) => {
+      offsets.push(pdf.length);
+      pdf += obj + '\n';
+    };
+
+    agregar('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj');
+    agregar('2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj');
+    agregar(
+      '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj'
     );
+    agregar(
+      `4 0 obj\n<< /Length ${contenido.length} >>\nstream\n${contenido}endstream\nendobj`
+    );
+    agregar('5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj');
+
+    const xref = pdf.length;
+    pdf += `xref\n0 ${offsets.length + 1}\n0000000000 65535 f \n`;
+    offsets.forEach((o) => {
+      pdf += o.toString().padStart(10, '0') + ' 00000 n \n';
+    });
+    pdf += `trailer\n<< /Size ${offsets.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+
+    const blob = new Blob([new TextEncoder().encode(pdf)], {
+      type: 'application/pdf',
+    });
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
   }
 
   private crearCSV(): string {
