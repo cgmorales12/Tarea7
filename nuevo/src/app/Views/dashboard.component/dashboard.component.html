@@ -18,6 +18,7 @@
           <td>{{ usuario.email }}</td>
           <td>{{ usuario.activo == false ? 'Usuario Inactivo' : 'Usuario Activo' }}</td>
           <td>
+            <button (click)="nuevoUsuario()">Nuevo</button>
             <button (click)="editarUsuario(usuario)">Editar</button>
             <button (click)="eliminarUsuario(usuario.id)">Eliminar</button>
           </td>

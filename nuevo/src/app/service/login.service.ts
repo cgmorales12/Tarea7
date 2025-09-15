@@ -18,6 +18,10 @@ export class LoginService {
     return this.http.get<IUsuarioInterface[]>(this.rutaAPI);
   }
 
+  crear_usuario(usuario: IUsuarioInterface): Observable<IUsuarioInterface> {
+    return this.http.post<IUsuarioInterface>(this.rutaAPI, usuario);
+  }
+
   actualizar_usuario(usuario: IUsuarioInterface): Observable<IUsuarioInterface> {
     return this.http.put<IUsuarioInterface>(`${this.rutaAPI}/${usuario.id}`, usuario);
   }

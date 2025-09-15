@@ -115,6 +115,36 @@ export class DashboardComponent implements OnInit {
     this.reporteCSV = this.crearCSV();
   }
 
+  nuevoUsuario() {
+    const nombre = prompt('Nombre');
+    if (nombre === null) return;
+
+    const apellido = prompt('Apellido');
+    if (apellido === null) return;
+
+    const email = prompt('Email');
+    if (email === null) return;
+
+    const contrasenia = prompt('Contraseña');
+    if (contrasenia === null) return;
+
+    const estado = prompt('Estado (Activo/Inactivo)', 'Activo');
+    if (estado === null) return;
+    const activo = estado.toLowerCase() === 'activo';
+
+    const nuevo: IUsuarioInterface = {
+      nombre,
+      apellido,
+      email,
+      contrasenia,
+      activo,
+    };
+
+    this.usuariosServicio.crear_usuario(nuevo).subscribe((creado) => {
+      this.lista_usuario.push(creado);
+    });
+  }
+
   editarUsuario(usuario: IUsuarioInterface) {
     const nombre = prompt('Nombre', usuario.nombre);
     if (nombre === null) return;
