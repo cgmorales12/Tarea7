@@ -114,4 +114,32 @@ export class DashboardComponent implements OnInit {
   verReporteCSV() {
     this.reporteCSV = this.crearCSV();
   }
+
+  editarUsuario(usuario: IUsuarioInterface) {
+    const nombre = prompt('Nombre', usuario.nombre);
+    if (nombre === null) return;
+    const apellido = prompt('Apellido', usuario.apellido);
+    if (apellido === null) return;
+    const email = prompt('Email', usuario.email);
+    if (email === null) return;
+    const activo = confirm('¿Usuario activo?');
+    const actualizado: IUsuarioInterface = {
+      ...usuario,
+      nombre,
+      apellido,
+      email,
+      activo,
+    };
+    this.usuariosServicio
+      .actualizar_usuario(actualizado)
+      .subscribe(() => Object.assign(usuario, actualizado));
+  }
+
+  eliminarUsuario(id?: number) {
+    if (id == null) return;
+    if (!confirm('¿Desea eliminar el usuario?')) return;
+    this.usuariosServicio.eliminar_usuario(id).subscribe(() => {
+      this.lista_usuario = this.lista_usuario.filter((u) => u.id !== id);
+    });
+  }
 }
